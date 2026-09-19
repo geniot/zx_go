@@ -39,6 +39,7 @@ func fileDialogSize(win fyne.Size) fyne.Size {
 // showFileDialog opens a file browser sized to the window it belongs to,
 // rather than at Fyne's cramped default.
 func showFileDialog(fd *dialog.FileDialog, w fyne.Window) {
-	fd.Resize(fileDialogSize(w.Canvas().Size()))
 	fd.Show()
+	// Resize uses the internal implementation of the dialog which is initialized during the Show() above
+	fd.Resize(fileDialogSize(w.Canvas().Size()))
 }

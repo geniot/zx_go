@@ -134,3 +134,5 @@ pkg/testharness/testdata/local_titles.tsv
 #
 # Put game/media collections under games/ (ignored above), or add your own paths
 # to .git/info/exclude.
+
+.idea

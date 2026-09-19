@@ -6,7 +6,7 @@ import (
 	"os"
 	"sync"
 
-	"github.com/hajimehoshi/oto/v2"
+	"github.com/ebitengine/oto/v3"
 )
 
 // AYSource is the minimal interface that the audio system needs from an AY
@@ -90,7 +90,7 @@ var _ [queueCapacity - queuePrefill]struct{}
 // chip's own internal counters and don't need event-time alignment.
 type AudioSystem struct {
 	context *oto.Context
-	player  oto.Player
+	player  *oto.Player
 	reader  *audioReader
 
 	// Interleaved stereo sample ring buffer. All four counters are in int16
@@ -151,7 +151,8 @@ var (
 
 func sharedAudioContext() (*oto.Context, error) {
 	sharedCtxOnce.Do(func() {
-		ctx, ready, err := oto.NewContext(SampleRate, ChannelCount, oto.FormatSignedInt16LE)
+		contextOptions := &oto.NewContextOptions{SampleRate: SampleRate, ChannelCount: ChannelCount, Format: oto.FormatSignedInt16LE}
+		ctx, ready, err := oto.NewContext(contextOptions)
 		if err != nil {
 			sharedCtxErr = err
 			return
