@@ -3021,16 +3021,17 @@ func main() {
 	// callbacks route to the peripheral manager's Kempston mouse
 	// — they're no-ops when the mouse isn't enabled, so the
 	// handlers can always be installed.
-	keyboardWidget := newKeyboardWidget(
+	keyboardWidgetIns := newKeyboardWidget(
 		emu.handleKeyDown,
 		emu.handleKeyUp,
 	)
-	keyboardWidget.onTypedRune = emu.handleTypedRune
-	keyboardWidget.onFocusLost = emu.releaseAllInput
-	keyboardWidget.onMouseMove = func(dx, dy int) {
+	keyboardWidgetIns.onTypedRune = emu.handleTypedRune
+	keyboardWidgetIns.onFocusLost = emu.releaseAllInput
+	keyboardWidgetIns.onMouseMove = func(dx, dy int) {
+		w.Canvas().Focus(keyboardWidgetIns)
 		emu.peripherals.KempstonMouseMove(dx, dy)
 	}
-	keyboardWidget.onMouseBtn = func(btn int, pressed bool) {
+	keyboardWidgetIns.onMouseBtn = func(btn int, pressed bool) {
 		emu.peripherals.KempstonMouseButton(btn, pressed)
 	}
 
@@ -4712,18 +4713,18 @@ func main() {
 	surroundBG := canvas.NewRectangle(color.Black)
 	emu.surround = surroundBG
 	aspectScreen = container.New(screenLayoutFor(integerScaleOn, w.Canvas()), screen)
-	content := container.NewStack(surroundBG, aspectScreen, keyboardWidget)
+	content := container.NewStack(surroundBG, aspectScreen, keyboardWidgetIns)
 
 	// Show the splash artwork briefly, then swap to the real
 	// content and grab keyboard focus. The emulation goroutine
-	// starts running underneath the splash so by the time the
+	// starts running underneath the splash, so by the time the
 	// user is looking at the emulator the first frames are warm.
 	emu.run(a, screen)
 	emu.togglePause() // Start in a running state
 
 	showSplash(w, func() {
 		w.SetContent(content)
-		w.Canvas().Focus(keyboardWidget)
+		w.Canvas().Focus(keyboardWidgetIns)
 	})
 
 	// Set up cleanup on window close
